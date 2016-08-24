@@ -34,7 +34,6 @@ dependencyUpdates.resolutionStrategy = { componentSelection { rules -> rules.all
 
 repositories {
     flatDir name: 'localLib', dirs: frameworkDir.absolutePath + '/lib'
-    flatDir name: 'librepo', dirs: projectDir.absolutePath + '/librepo'
     jcenter()
 }
 
