@@ -56,7 +56,6 @@ dependencies {
         exclude group: 'xerces'
         exclude group: 'xml-apis' // can't exclude batik-ext but has some same classes as xml-apis so exclude that
     }
-    compile name: 'webvector', version: '3.4' // LGPL <== NOTE!
 }
 
 // by default the Java plugin runs test on build, change to not do that (only run test if explicit task)
