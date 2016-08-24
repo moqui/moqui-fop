@@ -34,6 +34,7 @@ dependencyUpdates.resolutionStrategy = { componentSelection { rules -> rules.all
 
 repositories {
     flatDir name: 'localLib', dirs: frameworkDir.absolutePath + '/lib'
+    flatDir name: 'librepo', dirs: projectDir.absolutePath + '/librepo'
     jcenter()
 }
 
@@ -49,6 +50,13 @@ dependencies {
     // barcode4j as a module to avoid required dependency on ant
     compile module('net.sf.barcode4j:barcode4j:2.1')
     compile module('net.sf.barcode4j:barcode4j-fop-ext:2.1')
+
+    // CSSBox and WebVector (HTML/CSS to SVG)
+    compile('net.sf.cssbox:cssbox:4.12') { // LGPL <== NOTE!
+        exclude group: 'xerces'
+        exclude group: 'xml-apis' // can't exclude batik-ext but has some same classes as xml-apis so exclude that
+    }
+    compile name: 'webvector', version: '3.4' // LGPL <== NOTE!
 }
 
 // by default the Java plugin runs test on build, change to not do that (only run test if explicit task)
