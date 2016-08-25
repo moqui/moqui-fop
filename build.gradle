@@ -15,6 +15,8 @@
 apply plugin: 'groovy'
 
 sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
 def componentNode = parseComponent(project)
 version = componentNode.'@version'
 def jarBaseName = componentNode.'@name'
@@ -50,10 +52,13 @@ dependencies {
     compile module('net.sf.barcode4j:barcode4j:2.1')
     compile module('net.sf.barcode4j:barcode4j-fop-ext:2.1')
 
-    // CSSBox and WebVector (HTML/CSS to SVG)
+    // CSSBox (HTML/CSS to SVG, etc)
     compile('net.sf.cssbox:cssbox:4.12') { // LGPL <== NOTE!
-        exclude group: 'xerces'
+        exclude group: 'xalan'
         exclude group: 'xml-apis' // can't exclude batik-ext but has some same classes as xml-apis so exclude that
+    }
+    compile ('org.apache.xmlgraphics:batik-transcoder:1.8') {
+        exclude group: 'xalan'
     }
 }
 

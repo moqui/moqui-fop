@@ -5,5 +5,11 @@
     <tools>
         <tool-factory class="org.moqui.fop.FopToolFactory" init-priority="20" disabled="false"/>
     </tools>
+    <webapp-list>
+        <webapp name="webroot">
+            <servlet name="HtmlRenderServlet" class="org.moqui.fop.HtmlRenderServlet" load-on-startup="1">
+                <url-pattern>/htmlr/*</url-pattern></servlet>
+        </webapp>
+    </webapp-list>
     <resource-facade xsl-fo-handler-factory="FOP"/>
 </moqui-conf>
