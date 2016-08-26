@@ -36,6 +36,7 @@ dependencyUpdates.resolutionStrategy = { componentSelection { rules -> rules.all
 
 repositories {
     flatDir name: 'localLib', dirs: frameworkDir.absolutePath + '/lib'
+    flatDir name: 'librepo', dirs: projectDir.absolutePath + '/librepo'
     jcenter()
 }
 
@@ -53,13 +54,16 @@ dependencies {
     compile module('net.sf.barcode4j:barcode4j-fop-ext:2.1')
 
     // CSSBox (HTML/CSS to SVG, etc)
-    compile('net.sf.cssbox:cssbox:4.12') { // LGPL <== NOTE!
+    compile ('net.sf.cssbox:cssbox:4.12') { // LGPL <== NOTE!
         exclude group: 'xalan'
         exclude group: 'xml-apis' // can't exclude batik-ext but has some same classes as xml-apis so exclude that
     }
     compile ('org.apache.xmlgraphics:batik-transcoder:1.8') {
         exclude group: 'xalan'
     }
+    compile ('org.apache.pdfbox:pdfbox:2.0.2') // Apache 2.0
+    // NOTE: this comes from a custom build, see: https://github.com/jonesde/CSSBoxPdf
+    compile name: 'cssbox-pdf', version: '1.0-SNAPSHOT' // LGPL <== NOTE!
 }
 
 // by default the Java plugin runs test on build, change to not do that (only run test if explicit task)

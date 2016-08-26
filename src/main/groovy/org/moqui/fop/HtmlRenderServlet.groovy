@@ -17,7 +17,6 @@ import groovy.transform.CompileStatic
 import org.apache.batik.transcoder.TranscoderInput
 import org.apache.batik.transcoder.TranscoderOutput
 import org.apache.fop.svg.PDFTranscoder
-
 import org.moqui.context.ArtifactAuthorizationException
 import org.moqui.context.ArtifactTarpitException
 import org.moqui.context.ExecutionContext
@@ -32,17 +31,12 @@ import javax.servlet.ServletException
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import java.awt.Dimension
 
 @CompileStatic
 class HtmlRenderServlet extends HttpServlet {
     protected final static Logger logger = LoggerFactory.getLogger(HtmlRenderServlet.class)
 
-    static final Map<String, Dimension> pageFormatDimensions = [A0:new Dimension(2348, 3370), A1:new Dimension(1648, 2348),
-            A2:new Dimension(1191, 1648), A3:new Dimension(842, 1191), A4:new Dimension(595, 842),
-            A5:new Dimension(420, 595), A6:new Dimension(298, 420), LETTER:new Dimension(612, 792), LETTERP:new Dimension(792, 612),
-            LETTERB:new Dimension(992, 1284), LETTERBP:new Dimension(1284, 992)
-    ]
+    final static Map<String, String> outputToContentType = [ pdf:"application/pdf", svg:"image/svg+xml", png:"image/png" ]
 
     HtmlRenderServlet() {
         super()
@@ -70,15 +64,23 @@ class HtmlRenderServlet extends HttpServlet {
         String htmlUrl = ec.web.getWebappRootUrl(true, null) + "/" + pathInfo
 
         String filename = ec.web.parameters.get("filename") as String
-        String contentType = ec.web.requestParameters."contentType" as String ?: "application/pdf"
-        if (!"application/pdf".equals(contentType) && !"image/svg+xml".equals(contentType)) {
-            logger.info("In HtmlRenderSerlvet content type ${contentType} not valid, setting to application/pdf")
-            contentType = "application/pdf"
-        }
 
-        String pageFormat = ec.web.requestParameters."pageFormat" ?: "LETTERB"
-        if (!pageFormatDimensions.containsKey(pageFormat)) pageFormat = "LETTERB"
-        Dimension windowSize = pageFormatDimensions.get(pageFormat)
+        String output = ec.web.parameters.get("output")
+        if (!output || !outputToContentType.containsKey(output)) output = "pdf"
+        String contentType = outputToContentType.get(output)
+
+        String pageFormat = ec.web.parameters.pageFormat
+        if (!pageFormat || !HtmlRenderer.pdRectangles.containsKey(pageFormat)) pageFormat = "LETTER"
+        String scaleStr = ec.web.parameters.scale
+
+        String mediaType = ec.web.parameters.mediaType
+
+        // default hideNav to 'true'
+        if (!ec.context.hideNav) ec.context.hideNav = "true"
+        // include images? default false
+        boolean includeImages = ec.web.parameters.includeImages == "true"
+        // use FOP PDFTranscoder? default false
+        boolean useFopPdfTranscoder = ec.web.parameters.fopPdf == "true"
 
         String htmlText = null
         try {
@@ -98,15 +100,24 @@ class HtmlRenderServlet extends HttpServlet {
                 response.addHeader("Content-Disposition", "inline")
             }
 
-            HtmlRenderer htmlRenderer = new HtmlRenderer().setWindowSize(windowSize)
+            HtmlRenderer htmlRenderer = new HtmlRenderer().setWindowSize(pageFormat)
+            if (mediaType) htmlRenderer.setMediaType(mediaType)
+            htmlRenderer.setLoadImages(includeImages, false)
             htmlRenderer.setSourceString(htmlText, new URL(htmlUrl))
+            try {
+                if (scaleStr) htmlRenderer.setRenderScale(scaleStr as float)
+            } catch (Throwable t) {
+                logger.warn("Error parsing scale ${scaleStr}: ${t.toString()}")
+            }
 
             // special case disable authz for resource access
             boolean enableAuthz = !ecfi.getExecutionContext().getArtifactExecution().disableAuthz()
             try {
-                if ("image/svg+xml".equals(contentType)) {
+                if ("svg".equals(output)) {
                     htmlRenderer.renderSvg(response.getWriter())
-                } else {
+                } else if ("png".equals(output)) {
+                    htmlRenderer.renderImage(response.getOutputStream(), output)
+                } else if (useFopPdfTranscoder) {
                     StringWriter svgWriter = new StringWriter()
                     htmlRenderer.renderSvg(svgWriter)
 
@@ -118,6 +129,9 @@ class HtmlRenderServlet extends HttpServlet {
                     if (logger.traceEnabled) logger.trace("Produced SVG:\n${svgString}")
                     transcoder.transcode(new TranscoderInput(new StringReader(svgString)),
                             new TranscoderOutput(response.getOutputStream()));
+                } else {
+                    // images cause issues, seems broken in cssbox-pdf
+                    htmlRenderer.renderPdf(response.getOutputStream())
                 }
             } finally {
                 if (enableAuthz) ecfi.getExecutionContext().getArtifactExecution().enableAuthz()
@@ -149,6 +163,6 @@ class HtmlRenderServlet extends HttpServlet {
             ec.destroy()
         }
 
-        if (logger.infoEnabled) logger.info("Finished HTML Render request to ${pathInfo}, content type ${response.getContentType()} in ${System.currentTimeMillis()-startTime}ms; session ${request.session.id} thread ${Thread.currentThread().id}:${Thread.currentThread().name}")
+        if (logger.infoEnabled) logger.info("Finished HTML Render request to ${pathInfo}, content type ${response.getContentType()} in ${System.currentTimeMillis() - startTime}ms; session ${request.session.id} thread ${Thread.currentThread().id}:${Thread.currentThread().name}")
     }
 }

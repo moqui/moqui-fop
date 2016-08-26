@@ -15,13 +15,17 @@ package org.moqui.fop
 
 import cz.vutbr.web.css.MediaSpec
 import groovy.transform.CompileStatic
+import org.apache.pdfbox.pdmodel.common.PDRectangle
 import org.fit.cssbox.css.CSSNorm
 import org.fit.cssbox.css.DOMAnalyzer
 import org.fit.cssbox.io.*
 import org.fit.cssbox.layout.BrowserCanvas
 import org.fit.cssbox.layout.BrowserConfig
 import org.fit.cssbox.layout.Viewport
+import org.fit.cssbox.render.PDFRenderer
 import org.fit.cssbox.render.SVGRenderer
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.w3c.dom.Document
 import org.xml.sax.SAXException
 
@@ -31,18 +35,44 @@ import java.nio.charset.StandardCharsets
 
 @CompileStatic
 class HtmlRenderer {
+    protected final static Logger logger = LoggerFactory.getLogger(HtmlRenderer.class)
+
+    static final Map<String, PDRectangle> pdRectangles =
+            [ A0:PDRectangle.A0, A1:PDRectangle.A1, A2:PDRectangle.A2, A3:PDRectangle.A3, A4:PDRectangle.A4,
+              A5:PDRectangle.A5, A6:PDRectangle.A6, LEGAL:PDRectangle.LEGAL, LETTER:PDRectangle.LETTER ]
+    /* turned out not to need these:
+    static PDRectangle dimToPdr(Dimension dim) { return new PDRectangle(dim.width as float, dim.height as float) }
+    static final Map<String, Dimension> pageFormatDimensions =
+            [ A0:pdrToDim(PDRectangle.A0), A1:pdrToDim(PDRectangle.A1), A2:pdrToDim(PDRectangle.A2),
+              A3:pdrToDim(PDRectangle.A3), A4:pdrToDim(PDRectangle.A4), A5:pdrToDim(PDRectangle.A5),
+              A6:pdrToDim(PDRectangle.A6), LETTER:pdrToDim(PDRectangle.LETTER), LEGAL:pdrToDim(PDRectangle.LEGAL)]
+    */
+    static Set<String> mediaTypes = new HashSet<>(['all', 'screen', 'print', 'speech'])
+
     private DocumentSource docSource = null
     private String mediaType = "screen"
-    private Dimension windowSize = new Dimension(992, 1284) // NOTE: 992 is the bootstrap md min-width, 1284 = (11/8.5)*992
+    private PDRectangle windowSizeRaw = PDRectangle.LETTER
+    // new Dimension(992, 1284) // NOTE: 992 is the bootstrap md min-width, 1284 = (11/8.5)*992
+    private float dimensionScale = 2.0f
     private boolean cropWindow = false
     private boolean loadImages = true
     private boolean loadBackgroundImages = false
 
     HtmlRenderer() { }
 
-    HtmlRenderer setWindowSize(Dimension size) { windowSize = size; return this }
+    HtmlRenderer setRenderScale(float scale) { dimensionScale = scale; return this }
+    HtmlRenderer setWindowSize(String wsStr) { windowSizeRaw = pdRectangles.get(wsStr); return this }
+    HtmlRenderer setWindowSize(PDRectangle pdr) { windowSizeRaw = pdr; return this }
+    Dimension getScaledDimension() { return new Dimension(getScaledWidth() as int, getScaledHeight() as int) }
+    float getScaledWidth() { return windowSizeRaw.width * dimensionScale }
+    float getScaledHeight() { return windowSizeRaw.height * dimensionScale }
+
     /** Default is 'screen', 'print' also valid */
-    HtmlRenderer setMediaType(String media) { mediaType = media; return this }
+    HtmlRenderer setMediaType(String media) {
+        if (mediaTypes.contains(media)) mediaType = media
+        else logger.warn("Ignoring media type ${media}, using previous/default setting ${mediaType}")
+        return this
+    }
     /** Defaults to false (don't crop at window size) */
     HtmlRenderer setCropWindow(boolean crop) { cropWindow = crop; return this }
     /** Defaults to true (include content), false (don't include background images) */
@@ -73,8 +103,9 @@ class HtmlRenderer {
 
         //create the media specification
         MediaSpec media = new MediaSpec(mediaType)
-        media.setDimensions(windowSize.width as float, windowSize.height as float)
-        media.setDeviceDimensions(windowSize.width as float, windowSize.height as float)
+        media.setDimensions(getScaledWidth(), getScaledHeight())
+        media.setDeviceDimensions(getScaledWidth(), getScaledHeight())
+        System.out.println("HTML Render dedia dimenstions: ${media.getWidth()},${media.getHeight()} device: ${media.getDeviceWidth()},${media.getDeviceHeight()}")
 
         //Create the CSS analyzer
         DOMAnalyzer da = new DOMAnalyzer(doc, docSource.getURL())
@@ -87,12 +118,13 @@ class HtmlRenderer {
 
         BrowserCanvas contentCanvas = new BrowserCanvas(da.getRoot(), da, docSource.getURL())
         contentCanvas.setAutoMediaUpdate(false) //we have a correct media specification, do not update
-        contentCanvas.getConfig().setClipViewport(cropWindow)
-        contentCanvas.getConfig().setLoadImages(loadImages)
-        contentCanvas.getConfig().setLoadBackgroundImages(loadBackgroundImages)
+        BrowserConfig browserConfig = contentCanvas.getConfig()
+        browserConfig.setClipViewport(cropWindow)
+        browserConfig.setLoadImages(loadImages)
+        browserConfig.setLoadBackgroundImages(loadBackgroundImages)
 
-        setDefaultFonts(contentCanvas.getConfig())
-        contentCanvas.createLayout(windowSize)
+        setDefaultFonts(browserConfig)
+        contentCanvas.createLayout(getScaledDimension())
 
         return contentCanvas
     }
@@ -120,6 +152,21 @@ class HtmlRenderer {
             if (docSource != null) docSource.close()
         }
     }
+
+    void renderPdf(OutputStream out) throws IOException, SAXException {
+        try {
+            BrowserCanvas contentCanvas = makeContentCanvas()
+            Viewport vp = contentCanvas.getViewport()
+            //obtain the viewport bounds depending on whether we are clipping to viewport size or using the whole page
+            Rectangle contentBounds = vp.getClippedContentBounds()
+            PDFRenderer render = new PDFRenderer(contentBounds.width as int, contentBounds.height as int, out, windowSizeRaw)
+            try { vp.draw(render) }
+            finally { render.close() }
+        } finally {
+            if (docSource != null) docSource.close()
+        }
+    }
+
 
     /** Sets some common fonts as the defaults for generic font families. */
     static protected void setDefaultFonts(BrowserConfig config) {
