@@ -92,7 +92,7 @@ class HtmlRenderServlet extends HttpServlet {
             if (logger.traceEnabled) logger.trace("HTML content:\n${htmlText}")
 
             response.setContentType(contentType)
-
+            if (output == "svg") response.setCharacterEncoding("UTF-8")
             if (filename) {
                 String utfFilename = StupidUtilities.encodeAsciiFilename(filename)
                 response.addHeader("Content-Disposition", "attachment; filename=\"${filename}\"; filename*=utf-8''${utfFilename}")
