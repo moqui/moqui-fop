@@ -19,7 +19,7 @@ import org.apache.fop.apps.io.ResourceResolverFactory
 import org.apache.xmlgraphics.io.Resource
 import org.apache.xmlgraphics.io.ResourceResolver
 import org.moqui.context.ExecutionContextFactory
-import org.moqui.context.ResourceReference
+import org.moqui.resource.ResourceReference
 import org.moqui.context.ToolFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
