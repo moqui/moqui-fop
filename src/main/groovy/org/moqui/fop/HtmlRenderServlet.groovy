@@ -20,10 +20,10 @@ import org.apache.fop.svg.PDFTranscoder
 import org.moqui.context.ArtifactAuthorizationException
 import org.moqui.context.ArtifactTarpitException
 import org.moqui.context.ExecutionContext
-import org.moqui.impl.StupidUtilities
 import org.moqui.impl.context.ExecutionContextFactoryImpl
 import org.moqui.impl.webapp.ScreenResourceNotFoundException
 import org.moqui.screen.ScreenRender
+import org.moqui.util.StringUtilities
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -99,7 +99,7 @@ class HtmlRenderServlet extends HttpServlet {
             response.setContentType(contentType)
             if (output == "svg") response.setCharacterEncoding("UTF-8")
             if (filename) {
-                String utfFilename = StupidUtilities.encodeAsciiFilename(filename)
+                String utfFilename = StringUtilities.encodeAsciiFilename(filename)
                 response.addHeader("Content-Disposition", "attachment; filename=\"${filename}\"; filename*=utf-8''${utfFilename}")
             } else {
                 response.addHeader("Content-Disposition", "inline")
