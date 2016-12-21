@@ -61,7 +61,7 @@ dependencies {
     compile ('org.apache.xmlgraphics:batik-transcoder:1.8') {
         exclude group: 'xalan'
     }
-    compile ('org.apache.pdfbox:pdfbox:2.0.3') // Apache 2.0
+    compile ('org.apache.pdfbox:pdfbox:2.0.4') // Apache 2.0
     // NOTE: this comes from a custom build, see: https://github.com/jonesde/CSSBoxPdf
     compile name: 'cssbox-pdf', version: '1.0-SNAPSHOT' // LGPL <== NOTE!
 }
