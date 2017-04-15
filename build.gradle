@@ -38,16 +38,22 @@ repositories {
     flatDir name: 'localLib', dirs: frameworkDir.absolutePath + '/lib'
     flatDir name: 'librepo', dirs: projectDir.absolutePath + '/librepo'
     jcenter()
+    mavenCentral()
 }
 
 dependencies {
     compile project(':framework')
 
     // Apache FOP
-    compile('org.apache.xmlgraphics:fop:2.1') { // Apache 2.0
+    compile('org.apache.xmlgraphics:fop:2.2') { // Apache 2.0
         exclude group: 'xalan'
         exclude group: 'xml-apis' // can't exclude batik-ext but has some same classes as xml-apis so exclude that
     }
+    compile ('org.apache.xmlgraphics:batik-transcoder:1.9') {
+        exclude group: 'xalan'
+    }
+    compile ('org.apache.xmlgraphics:batik-constants:1.9')
+    compile ('org.apache.xmlgraphics:batik-i18n:1.9')
 
     // barcode4j as a module to avoid required dependency on ant
     compile module('net.sf.barcode4j:barcode4j:2.1')
@@ -57,9 +63,6 @@ dependencies {
     compile ('net.sf.cssbox:cssbox:4.12') { // LGPL <== NOTE!
         exclude group: 'xalan'
         exclude group: 'xml-apis' // can't exclude batik-ext but has some same classes as xml-apis so exclude that
-    }
-    compile ('org.apache.xmlgraphics:batik-transcoder:1.8') {
-        exclude group: 'xalan'
     }
     compile ('org.apache.pdfbox:pdfbox:2.0.5') // Apache 2.0
     // NOTE: this comes from a custom build, see: https://github.com/jonesde/CSSBoxPdf
