@@ -64,7 +64,7 @@ dependencies {
         exclude group: 'xalan'
         exclude group: 'xml-apis' // can't exclude batik-ext but has some same classes as xml-apis so exclude that
     }
-    compile ('org.apache.pdfbox:pdfbox:2.0.5') // Apache 2.0
+    compile ('org.apache.pdfbox:pdfbox:2.0.6') // Apache 2.0
     // NOTE: this comes from a custom build, see: https://github.com/jonesde/CSSBoxPdf
     compile name: 'cssbox-pdf', version: '1.0-SNAPSHOT' // LGPL <== NOTE!
 }
