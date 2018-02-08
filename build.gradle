@@ -69,7 +69,7 @@ dependencies {
     compile module('net.sf.barcode4j:barcode4j-fop-ext:2.1')
 
     // CSSBox (HTML/CSS to SVG, etc)
-    compile ('net.sf.cssbox:cssbox:4.13') { // LGPL <== NOTE!
+    compile ('net.sf.cssbox:cssbox:4.14') { // LGPL <== NOTE!
         exclude group: 'xalan'
         exclude group: 'xml-apis' // can't exclude batik-ext but has some same classes as xml-apis so exclude that
     }
