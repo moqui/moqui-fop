@@ -16,6 +16,7 @@ package org.moqui.fop
 import groovy.transform.CompileStatic
 import org.apache.fop.apps.*
 import org.apache.fop.apps.io.ResourceResolverFactory
+import org.apache.fop.fo.FOTreeBuilder
 import org.apache.xmlgraphics.io.Resource
 import org.apache.xmlgraphics.io.ResourceResolver
 import org.moqui.context.ExecutionContextFactory
@@ -85,6 +86,11 @@ class FopToolFactory implements ToolFactory<org.xml.sax.ContentHandler> {
     void destroy() {
     }
 
+    // NOTE: invoked through reflection by ResourceFacadeImpl to get page count
+    Integer getPageCount(org.xml.sax.ContentHandler handler) {
+        return handler instanceof FOTreeBuilder ? handler.results.pageCount : null
+    }
+
     ExecutionContextFactory getEcf() { return ecf }
 
     @CompileStatic
@@ -92,12 +98,12 @@ class FopToolFactory implements ToolFactory<org.xml.sax.ContentHandler> {
         protected ExecutionContextFactory ecf
         protected ResourceResolver defaultResolver
 
-        public LocalResourceResolver(ExecutionContextFactory ecf, ResourceResolver defaultResolver) {
+        LocalResourceResolver(ExecutionContextFactory ecf, ResourceResolver defaultResolver) {
             this.ecf = ecf
             this.defaultResolver = defaultResolver
         }
 
-        public OutputStream getOutputStream(URI uri) throws IOException {
+        OutputStream getOutputStream(URI uri) throws IOException {
             ResourceReference rr = ecf.getResource().getLocationReference(uri.toASCIIString())
             if (rr != null) {
                 OutputStream os = rr.getOutputStream()
@@ -107,7 +113,7 @@ class FopToolFactory implements ToolFactory<org.xml.sax.ContentHandler> {
             return defaultResolver?.getOutputStream(uri)
         }
 
-        public Resource getResource(URI uri) throws IOException {
+        Resource getResource(URI uri) throws IOException {
             ResourceReference rr = ecf.getResource().getLocationReference(uri.toASCIIString())
             if (rr != null) {
                 InputStream is = rr.openStream()
