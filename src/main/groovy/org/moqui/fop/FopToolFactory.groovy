@@ -104,7 +104,7 @@ class FopToolFactory implements ToolFactory<org.xml.sax.ContentHandler> {
         }
 
         OutputStream getOutputStream(URI uri) throws IOException {
-            ResourceReference rr = ecf.getResource().getLocationReference(uri.toASCIIString())
+            ResourceReference rr = ecf.getResource().getLocationReference(uri.toString())
             if (rr != null) {
                 OutputStream os = rr.getOutputStream()
                 if (os != null) return os
@@ -114,7 +114,7 @@ class FopToolFactory implements ToolFactory<org.xml.sax.ContentHandler> {
         }
 
         Resource getResource(URI uri) throws IOException {
-            ResourceReference rr = ecf.getResource().getLocationReference(uri.toASCIIString())
+            ResourceReference rr = ecf.getResource().getLocationReference(uri.toString())
             if (rr != null) {
                 InputStream is = rr.openStream()
                 if (is != null) return new Resource(is)
