@@ -58,15 +58,14 @@ class HtmlRenderServlet extends HttpServlet {
             return
         }
 
-        String pathInfo = request.getPathInfo()
         long startTime = System.currentTimeMillis()
 
-        if (logger.traceEnabled) logger.trace("Start request to [${pathInfo}] at time [${startTime}] in session [${request.session.id}] thread [${Thread.currentThread().id}:${Thread.currentThread().name}]")
+        if (logger.traceEnabled) logger.trace("Start request to [${request.getPathInfo()}] at time [${startTime}] in session [${request.session.id}] thread [${Thread.currentThread().id}:${Thread.currentThread().name}]")
 
         ExecutionContext ec = ecfi.getExecutionContext()
         ec.initWebFacade(moquiWebappName, request, response)
         ec.web.requestAttributes.put("moquiRequestStartTime", startTime)
-        String htmlUrl = ec.web.getWebappRootUrl(true, null) + "/" + pathInfo
+        String htmlUrl = ec.web.getWebappRootUrl(true, null) + ec.web.getPathInfo()
 
         String filename = ec.web.parameters.get("filename") as String
 
@@ -89,8 +88,9 @@ class HtmlRenderServlet extends HttpServlet {
 
         String htmlText = null
         try {
+            ArrayList<String> pathInfoList = ec.web.getPathInfoList()
             ScreenRender sr = ec.screen.makeRender().webappName(moquiWebappName).renderMode("html")
-                    .rootScreenFromHost(request.getServerName()).screenPath(pathInfo.split("/") as List)
+                    .rootScreenFromHost(request.getServerName()).screenPath(pathInfoList)
             htmlText = sr.render()
 
             // logger.warn("======== HTML content from ${pathInfo}:\n${htmlText}")
@@ -141,6 +141,8 @@ class HtmlRenderServlet extends HttpServlet {
             } finally {
                 if (enableAuthz) ecfi.getExecutionContext().getArtifactExecution().enableAuthz()
             }
+
+            if (logger.infoEnabled) logger.info("Finished HTML Render request to ${pathInfoList}, content type ${response.getContentType()} in ${System.currentTimeMillis() - startTime}ms; session ${request.session.id} thread ${Thread.currentThread().id}:${Thread.currentThread().name}")
         } catch (ArtifactAuthorizationException e) {
             // SC_UNAUTHORIZED 401 used when authc/login fails, use SC_FORBIDDEN 403 for authz failures
             // See ScreenRenderImpl.checkWebappSettings for authc and SC_UNAUTHORIZED handling
@@ -167,7 +169,5 @@ class HtmlRenderServlet extends HttpServlet {
             // make sure everything is cleaned up
             ec.destroy()
         }
-
-        if (logger.infoEnabled) logger.info("Finished HTML Render request to ${pathInfo}, content type ${response.getContentType()} in ${System.currentTimeMillis() - startTime}ms; session ${request.session.id} thread ${Thread.currentThread().id}:${Thread.currentThread().name}")
     }
 }
