@@ -48,25 +48,27 @@ dependencies {
     compile project(':framework')
 
     // Apache FOP
-    compile('org.apache.xmlgraphics:fop:2.2') { // Apache 2.0
+    compile('org.apache.xmlgraphics:fop:2.3') { // Apache 2.0
         exclude group: 'xalan'
         exclude group: 'xml-apis' // can't exclude batik-ext but has some same classes as xml-apis so exclude that
         exclude group: 'org.mozilla'
         exclude group: 'org.python'
     }
-    compile ('org.apache.xmlgraphics:batik-transcoder:1.9.1') {
+    compile ('org.apache.xmlgraphics:batik-transcoder:1.10') {
         exclude group: 'xalan'
         exclude group: 'org.mozilla'
         exclude group: 'org.python'
     }
-    compile ('org.apache.xmlgraphics:batik-constants:1.9.1') {
+    compile ('org.apache.xmlgraphics:batik-constants:1.10') {
         exclude group: 'org.mozilla'
         exclude group: 'org.python'
     }
-    compile ('org.apache.xmlgraphics:batik-i18n:1.9.1') {
+    compile ('org.apache.xmlgraphics:batik-i18n:1.10') {
         exclude group: 'org.mozilla'
         exclude group: 'org.python'
     }
+
+    compile 'xerces:xercesImpl:2.11.0'
 
     // barcode4j as a module to avoid required dependency on ant
     compile module('net.sf.barcode4j:barcode4j:2.1')
