@@ -27,7 +27,7 @@ def frameworkDir = file(moquiDir.absolutePath + '/framework')
 apply plugin: 'com.github.ben-manes.versions'
 buildscript {
   repositories { jcenter() }
-  dependencies { classpath 'com.github.ben-manes:gradle-versions-plugin:0.20.0' }
+  dependencies { classpath 'com.github.ben-manes:gradle-versions-plugin:0.21.0' }
 }
 dependencyUpdates.resolutionStrategy = { componentSelection { rules -> rules.all { ComponentSelection selection ->
     boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier -> selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/ }
@@ -54,16 +54,16 @@ dependencies {
         exclude group: 'org.mozilla'
         exclude group: 'org.python'
     }
-    compile ('org.apache.xmlgraphics:batik-transcoder:1.10') {
+    compile ('org.apache.xmlgraphics:batik-transcoder:1.11') {
         exclude group: 'xalan'
         exclude group: 'org.mozilla'
         exclude group: 'org.python'
     }
-    compile ('org.apache.xmlgraphics:batik-constants:1.10') {
+    compile ('org.apache.xmlgraphics:batik-constants:1.11') {
         exclude group: 'org.mozilla'
         exclude group: 'org.python'
     }
-    compile ('org.apache.xmlgraphics:batik-i18n:1.10') {
+    compile ('org.apache.xmlgraphics:batik-i18n:1.11') {
         exclude group: 'org.mozilla'
         exclude group: 'org.python'
     }
@@ -79,7 +79,7 @@ dependencies {
         exclude group: 'xalan'
         exclude group: 'xml-apis' // can't exclude batik-ext but has some same classes as xml-apis so exclude that
     }
-    compile ('org.apache.pdfbox:pdfbox:2.0.11') // Apache 2.0
+    compile ('org.apache.pdfbox:pdfbox:2.0.14') // Apache 2.0
     // NOTE: this comes from a custom build, see: https://github.com/jonesde/CSSBoxPdf
     compile name: 'cssbox-pdf', version: '1.0-SNAPSHOT' // LGPL <== NOTE!
 }
