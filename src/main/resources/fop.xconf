@@ -79,7 +79,7 @@ the location of this file.
         -->
 
         <!-- auto-detect fonts -->
-        <!-- NOTE: commented this out because causes the error: "java.lang.OutOfMemoryError: Java heap space" <auto-detect/> -->
+        <auto-detect/>
 
       </fonts>
 
