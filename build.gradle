@@ -105,8 +105,8 @@ task cleanLib(type: Delete) { delete fileTree(dir: projectDir.absolutePath+'/lib
 clean.dependsOn cleanLib
 
 jar {
-    destinationDir = file(projectDir.absolutePath + '/lib')
-    baseName = jarBaseName
+    destinationDirectory = file(projectDir.absolutePath + '/lib')
+    archiveBaseName = jarBaseName
 }
 task copyDependencies { doLast {
     copy { from (configurations.runtime - project(':framework').configurations.runtime - project(':framework').jar.archivePath)
