@@ -48,7 +48,7 @@ dependencies {
     compile project(':framework')
 
     // Apache PDFBox
-    compile ('org.apache.pdfbox:pdfbox:2.0.17') // Apache 2.0
+    compile ('org.apache.pdfbox:pdfbox:2.0.18') // Apache 2.0
 
     // Apache FOP - Apache 2.0
     // NOTE: in Apache FOP 2.4 the dependencies are really messed up, includes redundant fop-core, fop-events, fop-url
