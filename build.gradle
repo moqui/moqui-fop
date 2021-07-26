@@ -51,15 +51,15 @@ dependencies {
     compile project(':framework')
 
     // Apache PDFBox
-    compile ('org.apache.pdfbox:pdfbox:2.0.20') // Apache 2.0
+    compile ('org.apache.pdfbox:pdfbox:2.0.24') // Apache 2.0
 
     // Apache FOP - Apache 2.0
-    // NOTE: in Apache FOP 2.5 the dependencies are really messed up, includes redundant fop-core, fop-events, fop-url
-    compile ('org.apache.xmlgraphics:fop-events:2.5') {
+    // NOTE: in Apache FOP 2.6 the dependencies are really messed up, includes redundant fop-core, fop-events, fop-url
+    compile ('org.apache.xmlgraphics:fop-events:2.6') {
         exclude group: 'org.apache.ant'
     }
-    compile ('org.apache.xmlgraphics:fop-util:2.5')
-    compile ('org.apache.xmlgraphics:fop-core:2.5') {
+    compile ('org.apache.xmlgraphics:fop-util:2.6')
+    compile ('org.apache.xmlgraphics:fop-core:2.6') {
         exclude group: 'xalan'
         exclude group: 'xml-apis' // can't exclude batik-ext but has some same classes as xml-apis so exclude that
         exclude group: 'org.apache.ant'
@@ -67,25 +67,25 @@ dependencies {
         exclude group: 'javax.media'
         exclude group: 'com.sun.media'
     }
-    compile ('org.apache.xmlgraphics:batik-transcoder:1.13') {
+    compile ('org.apache.xmlgraphics:batik-transcoder:1.14') {
         exclude group: 'xalan'
         exclude group: 'org.mozilla'
         exclude group: 'org.python'
     }
-    compile ('org.apache.xmlgraphics:batik-constants:1.13') {
+    compile ('org.apache.xmlgraphics:batik-constants:1.14') {
         exclude group: 'org.mozilla'
         exclude group: 'org.python'
     }
-    compile ('org.apache.xmlgraphics:batik-i18n:1.13') {
+    compile ('org.apache.xmlgraphics:batik-i18n:1.14') {
         exclude group: 'org.mozilla'
         exclude group: 'org.python'
     }
 
-    // NOTE: in theory Apache Avalon is not required for FOP 2.5, but getting runtime errors without it
+    // NOTE: in theory Apache Avalon is not required for FOP 2.6, but getting runtime errors without it
     compile group: 'org.apache.avalon.framework', name: 'avalon-framework-api', version: '4.3.1'
     compile group: 'org.apache.avalon.framework', name: 'avalon-framework-impl', version: '4.3.1'
 
-    compile 'xerces:xercesImpl:2.12.0'
+    compile 'xerces:xercesImpl:2.12.1'
 
     // barcode4j as a module to avoid required dependency on ant
     compile module('net.sf.barcode4j:barcode4j:2.1')
