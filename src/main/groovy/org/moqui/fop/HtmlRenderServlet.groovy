@@ -100,9 +100,9 @@ class HtmlRenderServlet extends HttpServlet {
             if (output == "svg") response.setCharacterEncoding("UTF-8")
             if (filename) {
                 String utfFilename = StringUtilities.encodeAsciiFilename(filename)
-                response.addHeader("Content-Disposition", "attachment; filename=\"${filename}\"; filename*=utf-8''${utfFilename}")
+                response.setHeader("Content-Disposition", "attachment; filename=\"${filename}\"; filename*=utf-8''${utfFilename}")
             } else {
-                response.addHeader("Content-Disposition", "inline")
+                response.setHeader("Content-Disposition", "inline")
             }
 
             HtmlRenderer htmlRenderer = new HtmlRenderer().setWindowSize(pageFormat)
