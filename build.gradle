@@ -51,15 +51,15 @@ dependencies {
     compile project(':framework')
 
     // Apache PDFBox
-    compile ('org.apache.pdfbox:pdfbox:2.0.24') // Apache 2.0
+    compile ('org.apache.pdfbox:pdfbox:2.0.25') // Apache 2.0
 
     // Apache FOP - Apache 2.0
     // NOTE: in Apache FOP 2.6 the dependencies are really messed up, includes redundant fop-core, fop-events, fop-url
-    compile ('org.apache.xmlgraphics:fop-events:2.6') {
+    compile ('org.apache.xmlgraphics:fop-events:2.7') {
         exclude group: 'org.apache.ant'
     }
-    compile ('org.apache.xmlgraphics:fop-util:2.6')
-    compile ('org.apache.xmlgraphics:fop-core:2.6') {
+    compile ('org.apache.xmlgraphics:fop-util:2.7')
+    compile ('org.apache.xmlgraphics:fop-core:2.7') {
         exclude group: 'xalan'
         exclude group: 'xml-apis' // can't exclude batik-ext but has some same classes as xml-apis so exclude that
         exclude group: 'org.apache.ant'
@@ -85,7 +85,7 @@ dependencies {
     compile group: 'org.apache.avalon.framework', name: 'avalon-framework-api', version: '4.3.1'
     compile group: 'org.apache.avalon.framework', name: 'avalon-framework-impl', version: '4.3.1'
 
-    compile 'xerces:xercesImpl:2.12.1'
+    compile 'xerces:xercesImpl:2.12.2'
 
     // barcode4j as a module to avoid required dependency on ant
     compile module('net.sf.barcode4j:barcode4j:2.1')
