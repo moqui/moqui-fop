@@ -30,7 +30,7 @@ buildscript {
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
     }
-  dependencies { classpath 'com.github.ben-manes:gradle-versions-plugin:0.27.0' }
+  dependencies { classpath 'com.github.ben-manes:gradle-versions-plugin:0.42.0' }
 }
 dependencyUpdates.resolutionStrategy = { componentSelection { rules -> rules.all { ComponentSelection selection ->
     boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier -> selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/ }
@@ -51,7 +51,7 @@ dependencies {
     implementation project(':framework')
 
     // Apache PDFBox
-    implementation ('org.apache.pdfbox:pdfbox:2.0.25') // Apache 2.0
+    implementation ('org.apache.pdfbox:pdfbox:2.0.26') // Apache 2.0
 
     // Apache FOP - Apache 2.0
     // NOTE: in Apache FOP 2.6 the dependencies are really messed up, includes redundant fop-core, fop-events, fop-url
