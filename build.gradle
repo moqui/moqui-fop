@@ -28,7 +28,7 @@ apply plugin: 'com.github.ben-manes.versions'
 buildscript {
     repositories {
         mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url = "https://plugins.gradle.org/m2/" }
     }
   dependencies { classpath 'com.github.ben-manes:gradle-versions-plugin:0.47.0' }
 }
@@ -87,9 +87,12 @@ dependencies {
 
     implementation 'xerces:xercesImpl:2.12.2'
 
-    // barcode4j as a module to avoid required dependency on ant
-    implementation module('net.sf.barcode4j:barcode4j:2.1')
-    implementation module('net.sf.barcode4j:barcode4j-fop-ext:2.1')
+    implementation('net.sf.barcode4j:barcode4j:2.1') {
+        exclude group: 'org.apache.ant', module: 'ant'
+    }
+    implementation('net.sf.barcode4j:barcode4j-fop-ext:2.1') {
+        exclude group: 'org.apache.ant', module: 'ant'
+    }
 
     // CSSBox (HTML/CSS to SVG, etc)
     implementation ('net.sf.cssbox:cssbox:4.17') { // LGPL <== NOTE!
