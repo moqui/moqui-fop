@@ -82,8 +82,8 @@ dependencies {
     }
 
     // NOTE: in theory Apache Avalon is not required for FOP 2.6, but getting runtime errors without it
-    implementation group: 'org.apache.avalon.framework', name: 'avalon-framework-api', version: '4.3.1'
-    implementation group: 'org.apache.avalon.framework', name: 'avalon-framework-impl', version: '4.3.1'
+    implementation "org.apache.avalon.framework:avalon-framework-api:4.3.1"
+    implementation "org.apache.avalon.framework:avalon-framework-impl:4.3.1"
 
     implementation 'xerces:xercesImpl:2.12.2'
 
@@ -100,7 +100,7 @@ dependencies {
         exclude group: 'xml-apis' // can't exclude batik-ext but has some same classes as xml-apis so exclude that
     }
     // NOTE: this comes from a custom build, see: https://github.com/jonesde/CSSBoxPdf
-    implementation name: 'cssbox-pdf', version: '1.0-SNAPSHOT' // LGPL <== NOTE!
+    implementation ":cssbox-pdf:1.0-SNAPSHOT" // LGPL <== NOTE!
 }
 
 // by default the Java plugin runs test on build, change to not do that (only run test if explicit task)
@@ -117,8 +117,12 @@ jar {
 task copyDependencies { doLast {
     // logger.lifecycle("configurations.runtimeClasspath: ${configurations.runtimeClasspath.files({true}).join('\n')}\n\n")
     // logger.lifecycle("project(':framework').configurations.runtimeClasspath: ${project(':framework').configurations.runtimeClasspath.files({true}).join('\n')}")
-    copy { from (configurations.runtimeClasspath - project(':framework').configurations.runtimeClasspath - project(':framework').jar.archivePath)
-        into file(projectDir.absolutePath + '/lib') }
+    copy {
+        from (configurations.runtimeClasspath -
+              project(':framework').configurations.runtimeClasspath -
+              project(':framework').tasks.named('jar').get().archiveFile.get().asFile)
+        into file(projectDir.absolutePath + '/lib')
+    }
 } }
 copyDependencies.dependsOn cleanLib
 jar.dependsOn copyDependencies
