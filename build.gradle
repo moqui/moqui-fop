@@ -88,9 +88,11 @@ dependencies {
     implementation 'xerces:xercesImpl:2.12.2'
 
     implementation('net.sf.barcode4j:barcode4j:2.1') {
+        exclude group: 'org.apache.xmlgraphics', module: 'fop'
         exclude group: 'org.apache.ant', module: 'ant'
     }
     implementation('net.sf.barcode4j:barcode4j-fop-ext:2.1') {
+        exclude group: 'org.apache.xmlgraphics', module: 'fop'
         exclude group: 'org.apache.ant', module: 'ant'
     }
 
