@@ -65,7 +65,7 @@ class HtmlRenderServlet extends HttpServlet {
         ExecutionContext ec = ecfi.getExecutionContext()
         ec.initWebFacade(moquiWebappName, request, response)
         ec.web.requestAttributes.put("moquiRequestStartTime", startTime)
-        String htmlUrl = ec.web.getWebappRootUrl(true, null) + ec.web.getPathInfo()
+        String htmlUrl = buildHtmlBaseUrl(ec, request)
 
         String filename = ec.web.parameters.get("filename") as String
 
@@ -158,16 +158,35 @@ class HtmlRenderServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, e.message)
         } catch (Throwable t) {
             logger.error("Error transforming HTML content:\n${htmlText}", t)
-            if (ec.message.hasError()) {
-                String errorsString = ec.message.errorsString
-                logger.error(errorsString, t)
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorsString)
-            } else {
-                throw t
+            if (ec.message.hasError()) logger.error(ec.message.errorsString, t)
+            // Do not rethrow or send exception text; Jetty's default error page would include the stack.
+            if (!response.isCommitted()) {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An internal error occurred")
             }
         } finally {
             // make sure everything is cleaned up
             ec.destroy()
         }
+    }
+
+    /** CSSBox needs an absolute base URL. Do not concatenate a null pathInfo (Groovy turns it into the literal "null"). */
+    static String buildHtmlBaseUrl(ExecutionContext ec, HttpServletRequest request) {
+        try {
+            String root = ec.web.getWebappRootUrl(true, false)
+            if (root != null && !root.isEmpty()) {
+                new URL(root)
+                return root
+            }
+        } catch (Exception e) {
+            logger.warn("HtmlRenderServlet getWebappRootUrl failed, using request URL: ${e.toString()}")
+        }
+        StringBuffer reqUrl = request.getRequestURL()
+        if (reqUrl != null && reqUrl.length() > 0) {
+            try {
+                new URL(reqUrl.toString())
+                return reqUrl.toString()
+            } catch (Exception ignored) { }
+        }
+        return "http://localhost/"
     }
 }
