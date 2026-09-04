@@ -34,7 +34,7 @@ dependencies {
     implementation project(':framework')
 
     // Apache PDFBox
-    implementation ('org.apache.pdfbox:pdfbox:3.0.6') // Apache 2.0
+    implementation ('org.apache.pdfbox:pdfbox:3.0.8') // Apache 2.0
 
     // Apache FOP - Apache 2.0
     implementation ('org.apache.xmlgraphics:fop-core:2.11')
